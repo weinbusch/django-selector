@@ -13,6 +13,8 @@ class FilterSet(ds.FilterSet):
     title = ds.CharFilter(label='Titel')
     author = ds.CharFilter(label='Author', name='author__name')
 
+    author_or_title = ds.CharFilter(name=['author__name', 'title'])
+
     min_date = ds.DateFilter(label='Ab Datum', name='date', lookup_expr='gte')
 
 class Tests(TestCase):
@@ -76,4 +78,10 @@ class Tests(TestCase):
         self.assertEqual(f.qs.count(), 1)
 
         f = FilterSet(data={'min_date': '1.1.1950'}, queryset=qs)
+        self.assertEqual(f.qs.count(), 1)
+
+        f = FilterSet(data={'author_or_title': 'kafka'}, queryset=qs)
+        self.assertEqual(f.qs.count(), 2)
+
+        f = FilterSet(data={'author_or_title': 'clown'}, queryset=qs)
         self.assertEqual(f.qs.count(), 1)
